@@ -9,6 +9,18 @@ export default function ForgotPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  function handleBlur(field: string, value: string, label: string) {
+    if (!value.trim()) {
+      setErrors((prev) => ({ ...prev, [field]: `${label} Cannot Be Empty` }));
+    } else {
+      setErrors((prev) => {
+        const copy = { ...prev };
+        if (copy[field] === `${label} Cannot Be Empty`) delete copy[field];
+        return copy;
+      });
+    }
+  }
+
   function validateFields(): boolean {
     const newErrors: Record<string, string> = {};
 
@@ -72,7 +84,13 @@ export default function ForgotPasswordPage() {
             className={`form-field__input${errors.email ? " form-field__input--error" : ""}`}
             placeholder="you@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errors.email === "Email Cannot Be Empty") {
+                setErrors((prev) => { const copy = { ...prev }; delete copy.email; return copy; });
+              }
+            }}
+            onBlur={() => handleBlur("email", email, "Email")}
             autoComplete="email"
             aria-describedby={errors.email ? "forgot-email-error" : undefined}
           />

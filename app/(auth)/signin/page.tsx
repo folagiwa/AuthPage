@@ -10,6 +10,18 @@ export default function SignInPage() {
   const [serverError, setServerError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  function handleBlur(field: string, value: string, label: string) {
+    if (!value.trim()) {
+      setErrors((prev) => ({ ...prev, [field]: `${label} Cannot Be Empty` }));
+    } else {
+      setErrors((prev) => {
+        const copy = { ...prev };
+        if (copy[field] === `${label} Cannot Be Empty`) delete copy[field];
+        return copy;
+      });
+    }
+  }
+
   function validateFields(): boolean {
     const newErrors: Record<string, string> = {};
 
@@ -65,7 +77,13 @@ export default function SignInPage() {
             className={`form-field__input${errors.email ? " form-field__input--error" : ""}`}
             placeholder="you@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errors.email === "Email Cannot Be Empty") {
+                setErrors((prev) => { const copy = { ...prev }; delete copy.email; return copy; });
+              }
+            }}
+            onBlur={() => handleBlur("email", email, "Email")}
             autoComplete="email"
             aria-describedby={errors.email ? "signin-email-error" : undefined}
           />
@@ -86,7 +104,13 @@ export default function SignInPage() {
             className={`form-field__input${errors.password ? " form-field__input--error" : ""}`}
             placeholder="Your password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errors.password === "Password Cannot Be Empty") {
+                setErrors((prev) => { const copy = { ...prev }; delete copy.password; return copy; });
+              }
+            }}
+            onBlur={() => handleBlur("password", password, "Password")}
             autoComplete="current-password"
             aria-describedby={
               errors.password ? "signin-password-error" : undefined

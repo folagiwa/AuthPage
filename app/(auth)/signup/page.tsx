@@ -12,6 +12,18 @@ export default function SignUpPage() {
   const [serverError, setServerError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  function handleBlur(field: string, value: string, label: string) {
+    if (!value.trim()) {
+      setErrors((prev) => ({ ...prev, [field]: `${label} Cannot Be Empty` }));
+    } else {
+      setErrors((prev) => {
+        const copy = { ...prev };
+        if (copy[field] === `${label} Cannot Be Empty`) delete copy[field];
+        return copy;
+      });
+    }
+  }
+
   function validateFields(): boolean {
     const newErrors: Record<string, string> = {};
 
@@ -84,7 +96,13 @@ export default function SignUpPage() {
             className={`form-field__input${errors.name ? " form-field__input--error" : ""}`}
             placeholder="Your name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (errors.name === "Name Cannot Be Empty") {
+                setErrors((prev) => { const copy = { ...prev }; delete copy.name; return copy; });
+              }
+            }}
+            onBlur={() => handleBlur("name", name, "Name")}
             autoComplete="name"
             aria-describedby={errors.name ? "signup-name-error" : undefined}
           />
@@ -105,7 +123,13 @@ export default function SignUpPage() {
             className={`form-field__input${errors.email ? " form-field__input--error" : ""}`}
             placeholder="you@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errors.email === "Email Cannot Be Empty") {
+                setErrors((prev) => { const copy = { ...prev }; delete copy.email; return copy; });
+              }
+            }}
+            onBlur={() => handleBlur("email", email, "Email")}
             autoComplete="email"
             aria-describedby={errors.email ? "signup-email-error" : undefined}
           />
@@ -126,7 +150,13 @@ export default function SignUpPage() {
             className={`form-field__input${errors.password ? " form-field__input--error" : ""}`}
             placeholder="At least 8 characters"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errors.password === "Password Cannot Be Empty") {
+                setErrors((prev) => { const copy = { ...prev }; delete copy.password; return copy; });
+              }
+            }}
+            onBlur={() => handleBlur("password", password, "Password")}
             autoComplete="new-password"
             aria-describedby={errors.password ? "signup-password-error" : undefined}
           />
@@ -147,7 +177,13 @@ export default function SignUpPage() {
             className={`form-field__input${errors.confirmPassword ? " form-field__input--error" : ""}`}
             placeholder="Re-enter your password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              if (errors.confirmPassword === "Confirm password Cannot Be Empty") {
+                setErrors((prev) => { const copy = { ...prev }; delete copy.confirmPassword; return copy; });
+              }
+            }}
+            onBlur={() => handleBlur("confirmPassword", confirmPassword, "Confirm password")}
             autoComplete="new-password"
             aria-describedby={
               errors.confirmPassword ? "signup-confirm-error" : undefined

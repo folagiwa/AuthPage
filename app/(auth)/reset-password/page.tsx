@@ -15,6 +15,18 @@ function ResetPasswordForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  function handleBlur(field: string, value: string, label: string) {
+    if (!value.trim()) {
+      setErrors((prev) => ({ ...prev, [field]: `${label} Cannot Be Empty` }));
+    } else {
+      setErrors((prev) => {
+        const copy = { ...prev };
+        if (copy[field] === `${label} Cannot Be Empty`) delete copy[field];
+        return copy;
+      });
+    }
+  }
+
   // FR-4.1: If no token is in the URL, show error state
   if (!token) {
     return (
@@ -118,7 +130,13 @@ function ResetPasswordForm() {
             className={`form-field__input${errors.password ? " form-field__input--error" : ""}`}
             placeholder="At least 8 characters"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errors.password === "New password Cannot Be Empty") {
+                setErrors((prev) => { const copy = { ...prev }; delete copy.password; return copy; });
+              }
+            }}
+            onBlur={() => handleBlur("password", password, "New password")}
             autoComplete="new-password"
             aria-describedby={
               errors.password ? "reset-password-error" : undefined
@@ -141,7 +159,13 @@ function ResetPasswordForm() {
             className={`form-field__input${errors.confirmPassword ? " form-field__input--error" : ""}`}
             placeholder="Re-enter your new password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              if (errors.confirmPassword === "Confirm new password Cannot Be Empty") {
+                setErrors((prev) => { const copy = { ...prev }; delete copy.confirmPassword; return copy; });
+              }
+            }}
+            onBlur={() => handleBlur("confirmPassword", confirmPassword, "Confirm new password")}
             autoComplete="new-password"
             aria-describedby={
               errors.confirmPassword ? "reset-confirm-error" : undefined

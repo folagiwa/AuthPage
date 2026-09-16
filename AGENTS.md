@@ -155,3 +155,13 @@ A task is not done because the feature "works." It is done when this checklist i
 - Checked for rules that were actually just preferences in disguise. Removed a draft rule about "always use arrow functions over function declarations" — that is a style nit, not something whose violation would fail a working feature, so it was left out rather than forced in.
 - Checked for contradictions between locked choices (Section 2) and never-rules (Section 3). None found — the Redis exclusion in Section 2 and the atomic-upsert requirement in Section 3 are consistent, not competing.
 - Checked that Phase 2 exclusion is stated more than once, since it's the rule most likely to be silently violated by an agent trying to be "helpful" by building ahead. It appears in Sections 1, 2 (implicitly via the locked rate-limit store), 3 (rule 13), and 6 (done checklist).
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
