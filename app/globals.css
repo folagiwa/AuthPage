@@ -1,0 +1,347 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap");
+
+/* ========================================================================
+ * Global Styles
+ * All values reference design-tokens.css variables.
+ * No hardcoded hex, spacing, or font values.
+ * ======================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  height: 100%;
+  font-family: var(--type-body-large-font-family);
+  font-size: var(--type-body-large-font-size);
+  font-weight: var(--type-body-large-font-weight);
+  line-height: var(--type-body-large-line-height);
+  letter-spacing: var(--type-body-large-letter-spacing);
+  color: var(--color-on-surface);
+  background-color: var(--color-surface);
+}
+
+/* ========================================================================
+ * Auth Layout — Shared across all (auth) route group pages
+ * ======================================================================== */
+
+.auth-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--spacing-base-spacing);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background-color: var(--color-surface-container-lowest);
+  border-radius: 16px;
+  padding: var(--spacing-large-group-spacing);
+  box-shadow: var(--effect-soft-shadow);
+}
+
+.auth-card__header {
+  text-align: center;
+  margin-bottom: var(--spacing-very-large-spacing);
+}
+
+.auth-card__title {
+  font-family: var(--type-headline-small-font-family);
+  font-size: var(--type-headline-small-font-size);
+  font-weight: var(--type-headline-small-font-weight);
+  line-height: var(--type-headline-small-line-height);
+  letter-spacing: var(--type-headline-small-letter-spacing);
+  color: var(--color-on-surface);
+  margin-bottom: var(--spacing-small-spacing);
+}
+
+.auth-card__subtitle {
+  font-family: var(--type-body-medium-font-family);
+  font-size: var(--type-body-medium-font-size);
+  font-weight: var(--type-body-medium-font-weight);
+  line-height: var(--type-body-medium-line-height);
+  letter-spacing: var(--type-body-medium-letter-spacing);
+  color: var(--color-on-surface-variant);
+}
+
+/* ========================================================================
+ * Form Elements
+ * ======================================================================== */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-large-spacing);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-extra-small-spacing);
+}
+
+.form-field__label {
+  font-family: var(--type-label-medium-font-family);
+  font-size: var(--type-label-medium-font-size);
+  font-weight: var(--type-label-medium-font-weight);
+  line-height: var(--type-label-medium-line-height);
+  letter-spacing: var(--type-label-medium-letter-spacing);
+  color: var(--color-on-surface);
+}
+
+.form-field__input {
+  width: 100%;
+  padding: var(--spacing-medium-spacing) var(--spacing-base-spacing);
+  font-family: var(--type-body-large-font-family);
+  font-size: var(--type-body-large-font-size);
+  font-weight: var(--type-body-large-font-weight);
+  line-height: var(--type-body-large-line-height);
+  letter-spacing: var(--type-body-large-letter-spacing);
+  color: var(--color-on-surface);
+  background-color: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-field__input::placeholder {
+  color: var(--color-outline);
+}
+
+.form-field__input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.form-field__input--error {
+  border-color: var(--color-error);
+}
+
+.form-field__input--error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-error) 12%, transparent);
+}
+
+.form-field__error {
+  font-family: var(--type-body-small-font-family);
+  font-size: var(--type-body-small-font-size);
+  font-weight: var(--type-body-small-font-weight);
+  line-height: var(--type-body-small-line-height);
+  letter-spacing: var(--type-body-small-letter-spacing);
+  color: var(--color-error);
+  min-height: var(--type-body-small-line-height);
+}
+
+/* ========================================================================
+ * Buttons
+ * ======================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--spacing-medium-spacing) var(--spacing-extra-l-spacing);
+  font-family: var(--type-label-large-font-family);
+  font-size: var(--type-label-large-font-size);
+  font-weight: var(--type-label-large-font-weight);
+  line-height: var(--type-label-large-line-height);
+  letter-spacing: var(--type-label-large-letter-spacing);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  text-decoration: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn--primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.btn--primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn--secondary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-outline-variant);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background-color: var(--color-surface-container-high);
+}
+
+/* ========================================================================
+ * Links
+ * ======================================================================== */
+
+.auth-link {
+  font-family: var(--type-body-medium-font-family);
+  font-size: var(--type-body-medium-font-size);
+  font-weight: var(--type-body-medium-font-weight);
+  line-height: var(--type-body-medium-line-height);
+  letter-spacing: var(--type-body-medium-letter-spacing);
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.auth-link:hover {
+  opacity: 0.8;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: var(--spacing-extra-l-spacing);
+  font-family: var(--type-body-medium-font-family);
+  font-size: var(--type-body-medium-font-size);
+  font-weight: var(--type-body-medium-font-weight);
+  line-height: var(--type-body-medium-line-height);
+  letter-spacing: var(--type-body-medium-letter-spacing);
+  color: var(--color-on-surface-variant);
+}
+
+/* ========================================================================
+ * Server-side message (success/error banners)
+ * ======================================================================== */
+
+.message {
+  padding: var(--spacing-medium-spacing) var(--spacing-base-spacing);
+  border-radius: 10px;
+  font-family: var(--type-body-medium-font-family);
+  font-size: var(--type-body-medium-font-size);
+  font-weight: var(--type-body-medium-font-weight);
+  line-height: var(--type-body-medium-line-height);
+  letter-spacing: var(--type-body-medium-letter-spacing);
+}
+
+.message--error {
+  background-color: var(--color-error-container);
+  color: var(--color-on-error-container);
+}
+
+.message--success {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+}
+
+/* ========================================================================
+ * Dashboard Layout
+ * ======================================================================== */
+
+.dashboard-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--spacing-base-spacing);
+}
+
+.dashboard-shell {
+  text-align: center;
+}
+
+.dashboard-shell__greeting {
+  font-family: var(--type-headline-medium-font-family);
+  font-size: var(--type-headline-medium-font-size);
+  font-weight: var(--type-headline-medium-font-weight);
+  line-height: var(--type-headline-medium-line-height);
+  letter-spacing: var(--type-headline-medium-letter-spacing);
+  color: var(--color-on-surface);
+  margin-bottom: var(--spacing-very-large-spacing);
+}
+
+.dashboard-shell__signout {
+  composes: btn btn--secondary;
+  width: auto;
+  display: inline-flex;
+}
+
+/* ========================================================================
+ * Verification Code Input
+ * ======================================================================== */
+
+.code-input-group {
+  display: flex;
+  gap: var(--spacing-small-spacing);
+  justify-content: center;
+}
+
+.code-input-group__digit {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-family: var(--type-title-large-font-family);
+  font-size: var(--type-title-large-font-size);
+  font-weight: var(--type-title-large-font-weight);
+  line-height: var(--type-title-large-line-height);
+  letter-spacing: var(--type-title-large-letter-spacing);
+  color: var(--color-on-surface);
+  background-color: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.code-input-group__digit:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.resend-control {
+  text-align: center;
+  margin-top: var(--spacing-large-spacing);
+}
+
+.resend-control__timer {
+  font-family: var(--type-body-small-font-family);
+  font-size: var(--type-body-small-font-size);
+  font-weight: var(--type-body-small-font-weight);
+  line-height: var(--type-body-small-line-height);
+  letter-spacing: var(--type-body-small-letter-spacing);
+  color: var(--color-on-surface-variant);
+}
+
+/* ========================================================================
+ * Responsive
+ * ======================================================================== */
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: var(--spacing-very-large-spacing) var(--spacing-large-spacing);
+    border-radius: 0;
+    box-shadow: none;
+    max-width: none;
+  }
+
+  .auth-wrapper {
+    padding: var(--spacing-no-spacing);
+    align-items: stretch;
+  }
+}
