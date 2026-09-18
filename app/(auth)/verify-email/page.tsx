@@ -1,12 +1,20 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { Suspense, useState, useRef, useEffect, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { verifyEmail } from "@/lib/actions/verify-email";
+import { resendCode } from "@/lib/actions/resend-code";
 
 const CODE_LENGTH = 6;
 const RESEND_COOLDOWN_SECONDS = 60;
 
-export default function VerifyEmailPage() {
+function VerifyEmailForm() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const userId = searchParams.get("userId");
+  const notice = searchParams.get("notice");
+
   const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(""));
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,7 +41,6 @@ export default function VerifyEmailPage() {
 
   const handleDigitChange = useCallback(
     (index: number, value: string) => {
-      // Allow only single digits
       if (value && !/^\d$/.test(value)) return;
 
       const newDigits = [...digits];
@@ -41,7 +48,6 @@ export default function VerifyEmailPage() {
       setDigits(newDigits);
       setError("");
 
-      // Auto-advance to next input
       if (value && index < CODE_LENGTH - 1) {
         inputRefs.current[index + 1]?.focus();
       }
@@ -49,9 +55,44 @@ export default function VerifyEmailPage() {
     [digits]
   );
 
+  if (!userId) {
+    return (
+      <>
+        <div className="auth-card__header">
+          <h1 className="auth-card__title">Verification unavailable</h1>
+          <p className="auth-card__subtitle">
+            We couldn&apos;t identify the account to verify. Please sign in to continue.
+          </p>
+        </div>
+
+        <Link
+          href="/signin"
+          className="btn btn--primary"
+          style={{ marginTop: `var(--spacing-large-spacing)` }}
+        >
+          Back to sign in
+        </Link>
+      </>
+    );
+  }
+
+  const uid = userId;
+
+  const noticeMessage =
+    notice === "already-sent"
+      ? {
+          kind: "success" as const,
+          text: "A code was already sent, check your email or request a new one.",
+        }
+      : notice === "email-failed"
+        ? {
+            kind: "error" as const,
+            text: "We couldn't send your verification email. Use the resend option below.",
+          }
+        : null;
+
   function handleKeyDown(index: number, e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Backspace" && !digits[index] && index > 0) {
-      // Move to previous input on backspace when current is empty
       inputRefs.current[index - 1]?.focus();
     }
   }
@@ -70,7 +111,6 @@ export default function VerifyEmailPage() {
     setDigits(newDigits);
     setError("");
 
-    // Focus the next empty input or the last one
     const nextEmpty = newDigits.findIndex((d) => !d);
     const focusIndex = nextEmpty === -1 ? CODE_LENGTH - 1 : nextEmpty;
     inputRefs.current[focusIndex]?.focus();
@@ -88,11 +128,19 @@ export default function VerifyEmailPage() {
     setIsSubmitting(true);
     setError("");
 
-    // Server Action will be wired in separately.
-    // FR-5.2: On correct code → set emailVerified, create session, redirect to dashboard.
-    // FR-5.3: On incorrect code → show inline error.
-    // FR-5.4: On expired code → prompt to request a new one.
-    setIsSubmitting(false);
+    const formData = new FormData();
+    formData.append("userId", uid);
+    formData.append("code", code);
+
+    const result = await verifyEmail(formData);
+    if (result.error) setError(result.error);
+    if (result.fieldErrors) setError(result.fieldErrors.code ?? "");
+    
+    if (result.redirectUrl) {
+      router.push(result.redirectUrl);
+    } else {
+      setIsSubmitting(false);
+    }
   }
 
   async function handleResend() {
@@ -101,9 +149,16 @@ export default function VerifyEmailPage() {
     setIsResending(true);
     setError("");
 
-    // Server Action will be wired in separately.
-    // FR-5.5: Invalidate previous code, issue new one with fresh 15-minute expiry.
-    setResendCooldown(RESEND_COOLDOWN_SECONDS);
+    const formData = new FormData();
+    formData.append("userId", uid);
+
+    const result = await resendCode(formData);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
+    }
+
     setIsResending(false);
   }
 
@@ -115,6 +170,15 @@ export default function VerifyEmailPage() {
           Enter the 6-digit code sent to your email
         </p>
       </div>
+
+      {noticeMessage && (
+        <div
+          className={`message ${noticeMessage.kind === "success" ? "message--success" : "message--error"}`}
+          role="alert"
+        >
+          {noticeMessage.text}
+        </div>
+      )}
 
       {error && (
         <div className="message message--error" role="alert">
@@ -178,5 +242,13 @@ export default function VerifyEmailPage() {
         </Link>
       </p>
     </>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense>
+      <VerifyEmailForm />
+    </Suspense>
   );
 }

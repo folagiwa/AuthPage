@@ -1,26 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { signIn } from "@/lib/actions/sign-in";
 
-export default function SignInPage() {
+function SignInForm() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const resetSuccess = searchParams.get("reset") === "success";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  function handleBlur(field: string, value: string, label: string) {
-    if (!value.trim()) {
-      setErrors((prev) => ({ ...prev, [field]: `${label} Cannot Be Empty` }));
-    } else {
-      setErrors((prev) => {
-        const copy = { ...prev };
-        if (copy[field] === `${label} Cannot Be Empty`) delete copy[field];
-        return copy;
-      });
-    }
-  }
 
   function validateFields(): boolean {
     const newErrors: Record<string, string> = {};
@@ -47,8 +41,19 @@ export default function SignInPage() {
 
     setIsSubmitting(true);
 
-    // Server Action will be wired in separately.
-    setIsSubmitting(false);
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+
+    const result = await signIn(formData);
+    if (result.error) setServerError(result.error);
+    if (result.fieldErrors) setErrors(result.fieldErrors);
+    
+    if (result.redirectUrl) {
+      router.push(result.redirectUrl);
+    } else {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -59,6 +64,12 @@ export default function SignInPage() {
           Welcome back
         </p>
       </div>
+
+      {resetSuccess && (
+        <div className="message message--success" role="alert">
+          Your password has been reset. Sign in with your new password.
+        </div>
+      )}
 
       {serverError && (
         <div className="message message--error" role="alert">
@@ -77,13 +88,7 @@ export default function SignInPage() {
             className={`form-field__input${errors.email ? " form-field__input--error" : ""}`}
             placeholder="you@example.com"
             value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (errors.email === "Email Cannot Be Empty") {
-                setErrors((prev) => { const copy = { ...prev }; delete copy.email; return copy; });
-              }
-            }}
-            onBlur={() => handleBlur("email", email, "Email")}
+            onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
             aria-describedby={errors.email ? "signin-email-error" : undefined}
           />
@@ -104,13 +109,7 @@ export default function SignInPage() {
             className={`form-field__input${errors.password ? " form-field__input--error" : ""}`}
             placeholder="Your password"
             value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (errors.password === "Password Cannot Be Empty") {
-                setErrors((prev) => { const copy = { ...prev }; delete copy.password; return copy; });
-              }
-            }}
-            onBlur={() => handleBlur("password", password, "Password")}
+            onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
             aria-describedby={
               errors.password ? "signin-password-error" : undefined
@@ -146,5 +145,13 @@ export default function SignInPage() {
         </Link>
       </p>
     </>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense>
+      <SignInForm />
+    </Suspense>
   );
 }

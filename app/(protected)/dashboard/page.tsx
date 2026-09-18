@@ -1,15 +1,20 @@
-export default function DashboardPage() {
-  // Placeholder: user name will come from the session once auth is wired.
-  // FR-6.1: Displays the signed-in user's name and a sign out button. No other content.
-  const userName = "User";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth/session";
+import { signOut } from "@/lib/actions/sign-out";
+
+export default async function DashboardPage() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/signin");
+  }
 
   return (
     <div className="dashboard-wrapper">
       <div className="dashboard-shell">
         <h1 className="dashboard-shell__greeting">
-          Welcome, {userName}
+          Welcome, {user.name}
         </h1>
-        <form>
+        <form action={signOut}>
           <button
             id="dashboard-signout"
             type="submit"

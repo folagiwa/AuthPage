@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { forgotPassword } from "@/lib/actions/forgot-password";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverError, setServerError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -36,14 +38,25 @@ export default function ForgotPasswordPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setServerError("");
 
     if (!validateFields()) return;
 
     setIsSubmitting(true);
 
-    // Server Action will be wired in separately.
-    // On completion, always show the same generic message per FR-3.2.
-    setIsSubmitted(true);
+    const formData = new FormData();
+    formData.append("email", email);
+
+    const result = await forgotPassword(formData);
+    if (result.error) {
+      setServerError(result.error);
+    } else if (result.fieldErrors) {
+      setErrors(result.fieldErrors);
+    } else {
+      // FR-3.2: always show the same generic confirmation message.
+      setIsSubmitted(true);
+    }
+
     setIsSubmitting(false);
   }
 
@@ -72,6 +85,12 @@ export default function ForgotPasswordPage() {
           Enter your email and we&apos;ll send you a reset link
         </p>
       </div>
+
+      {serverError && (
+        <div className="message message--error" role="alert">
+          {serverError}
+        </div>
+      )}
 
       <form className="form" onSubmit={handleSubmit} noValidate>
         <div className="form-field">
